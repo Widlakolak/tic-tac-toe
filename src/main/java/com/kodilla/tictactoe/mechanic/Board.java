@@ -8,6 +8,12 @@ public class Board {
             {' ', ' ', ' '}
     };
 
+    private final int[][] referenceBoard = {
+            {1, 2, 3},
+            {4, 5, 6},
+            {7, 8, 9}
+    };
+
     public boolean makeMove(int field, char player) {
         int row = (field - 1) / 3;
         int col = (field - 1) % 3;
@@ -16,9 +22,17 @@ public class Board {
                 board[row][col] = player;
                 return true;
             }
-            return false;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-
         return false;
+    }
+
+    public char[][] getBoard() {
+        return board;
+    }
+
+    public int[][] getReferenceBoard() {
+        return referenceBoard;
     }
 }

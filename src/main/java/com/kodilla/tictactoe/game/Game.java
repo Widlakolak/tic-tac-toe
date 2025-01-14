@@ -1,25 +1,15 @@
 package com.kodilla.tictactoe.game;
 
+import com.kodilla.tictactoe.mechanic.Board;
+
 import java.util.Scanner;
 
 public class Game {
 
-    char[][] board = {
-            {' ', ' ', ' '},
-            {' ', ' ', ' '},
-            {' ', ' ', ' '}
-    };
-
-    int[][] referenceBoard = {
-            {1, 2, 3},
-            {4, 5, 6},
-            {7, 8, 9}
-    };
-
+    private final Board board = new Board();
     private static final char X = 'X';
     private static final char O = 'O';
     private boolean isXTurn = true;
-
 
     public static void main(String[] args) {
         Game game = new Game();
@@ -31,21 +21,31 @@ public class Game {
         int field;
 
         System.out.println("Welcome to Tic Tac Toe!");
-        printBoard(board);
         System.out.println("The player who succeeds in placing three of their marks\nin a horizontal, vertical, or diagonal row first is the winner.");
-        printReferenceBoard(referenceBoard);
+        printReferenceBoard(board.getReferenceBoard());
 
         while (true) {
-            System.out.println((isXTurn ? X : O) + " turn. Enter a number between 1 and 9:");
+            char player = isXTurn ? X : O;
+            System.out.println(player + " turn. Enter a number between 1 and 9:");
+            try {
             field = keyboardScan.nextInt();
-
             if (field < 1 || field > 9) {
-                printReferenceBoard(referenceBoard);
-                System.out.println("Now try harder!\nYou entered : " + field + "\nTip: Look at the reference board\nand enter the number from the field\nyou want to place your " + (isXTurn ? X : O) + " sign.");
+                printReferenceBoard(board.getReferenceBoard());
+                System.out.println("Now try harder!\nYou entered : " + field + "\nTip: Look at the reference board\nand enter the number from the field\nyou want to place your " + player + " sign.");
             } else {
-                System.out.println("You selected field: " + field);
-                printBoard(board);
-                isXTurn = !isXTurn;
+                if (board.makeMove(field, player)) {
+                    System.out.println(player + " to position " + field);
+                    printBoard(board.getBoard());
+                    isXTurn = !isXTurn;
+                } else {
+                    System.out.println(field + " - That space is taken1!");
+                }
+
+            }}
+            catch (Exception e) {
+                String invalidInput = keyboardScan.next();
+                printReferenceBoard(board.getReferenceBoard());
+                System.out.println("Now try harder!\nYou entered : " + invalidInput  + "\nTip: Look at the reference board\nand enter the number from the field\nyou want to place your " + player + " sign.");
             }
 
 
