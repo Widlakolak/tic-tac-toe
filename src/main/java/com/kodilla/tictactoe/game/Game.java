@@ -1,5 +1,7 @@
 package com.kodilla.tictactoe.game;
 
+import com.kodilla.tictactoe.logic.DrawChecker;
+import com.kodilla.tictactoe.logic.WinChecker;
 import com.kodilla.tictactoe.mechanic.Board;
 
 import java.util.Scanner;
@@ -7,6 +9,8 @@ import java.util.Scanner;
 public class Game {
 
     private final Board board = new Board();
+    private final DrawChecker drawChecker = new DrawChecker();
+    private final WinChecker winChecker = new WinChecker();
     private static final char X = 'X';
     private static final char O = 'O';
     private boolean isXTurn = true;
@@ -36,12 +40,21 @@ public class Game {
                 if (board.makeMove(field, player)) {
                     System.out.println(player + " to position " + field);
                     printBoard(board.getBoard());
+                    if (winChecker.win(board)) {
+                        System.out.println("Congratulations!! " + player + " won!");
+                        break;
+                    }
+                    if (drawChecker.draw(board)) {
+                        System.out.println("Draw! No one won.");
+                        break;
+                    }
                     isXTurn = !isXTurn;
                 } else {
-                    System.out.println(field + " - That space is taken1!");
+                    System.out.println(field + " - That space is taken!");
                 }
 
-            }}
+            }
+            }
             catch (Exception e) {
                 String invalidInput = keyboardScan.next();
                 printReferenceBoard(board.getReferenceBoard());
