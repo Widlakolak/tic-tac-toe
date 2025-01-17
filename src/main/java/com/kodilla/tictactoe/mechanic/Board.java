@@ -16,19 +16,20 @@ public class Board {
 
     private int moveCount = 0;
 
-    public boolean makeMove(int field, char player) {
+    public boolean makeMove(int field, char player) throws RuntimeException {
         int row = (field - 1) / 3;
         int col = (field - 1) % 3;
+
         try {
-            if (board[row][col] == ' ') {
-                board[row][col] = player;
-                moveCount++;
-                return true;
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+                    if (board[row][col] != ' ') {
+            throw new RuntimeException();
         }
+        board[row][col] = player;
+        moveCount++;
+        return true;
+    } catch (RuntimeException e) {
         return false;
+        }
     }
 
     public char[][] getBoard() {

@@ -15,9 +15,8 @@ public class Game {
     private static final char O = 'O';
     private boolean isXTurn = true;
 
-    public static void main(String[] args) {
-        Game game = new Game();
-        game.askInput();
+    public void start() {
+        askInput();
     }
 
     public void askInput() {
@@ -30,7 +29,8 @@ public class Game {
 
         while (true) {
             char player = isXTurn ? X : O;
-            System.out.println(player + " turn. Enter a number between 1 and 9:");
+            int maxField = board.getBoardSize();
+            System.out.println(player + " turn. Enter a number between 1 and " + maxField + ":");
             try {
             field = keyboardScan.nextInt();
             if (field < 1 || field > 9) {
@@ -42,11 +42,21 @@ public class Game {
                     printBoard(board.getBoard());
                     if (winChecker.win(board)) {
                         System.out.println("Congratulations!! " + player + " won!");
-                        break;
+                        System.out.println("Do you want to play again? (yes/no)");
+                        String response = keyboardScan.next().toLowerCase();
+                        if (!response.equals("yes")) {
+                            System.out.println("Thanks for playing!");
+                            break;
+                        }
                     }
                     if (drawChecker.draw(board)) {
                         System.out.println("Draw! No one won.");
-                        break;
+                        System.out.println("Do you want to play again? (yes/no)");
+                        String response = keyboardScan.next().toLowerCase();
+                        if (!response.equals("yes")) {
+                            System.out.println("Thanks for playing!");
+                            break;
+                        }
                     }
                     isXTurn = !isXTurn;
                 } else {

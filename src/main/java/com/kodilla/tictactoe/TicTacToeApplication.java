@@ -1,13 +1,13 @@
 package com.kodilla.tictactoe;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import com.kodilla.tictactoe.game.Game;
 
-@SpringBootApplication
 public class TicTacToeApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(TicTacToeApplication.class, args);
+
+		Game game = new Game();
+		game.start();
 	}
 
 }
