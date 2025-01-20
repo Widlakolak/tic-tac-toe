@@ -10,11 +10,15 @@ public class Board {
     private int moveCount = 0;
     private final List<Integer> fieldList = new ArrayList<>();
     private final int boardSize;
+    private final int rows;
+    private final int cols;
 
     public Board(int rows, int cols) {
         this.board = new char[rows][cols];
         this.referenceBoard = new int[rows][cols];
         this.boardSize = rows * cols;
+        this.rows = rows;
+        this.cols = cols;
 
         int fieldNumber = 1;
 
@@ -46,8 +50,8 @@ public class Board {
             return false;
         }
 
-        int row = (field - 1) / 3;
-        int col = (field - 1) % 3;
+        int row = (field - 1) / cols;
+        int col = (field - 1) % cols;
 
         if (board[row][col] != ' ') {
             return false;

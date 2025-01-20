@@ -17,7 +17,7 @@ class TicTacToeApplicationTests {
 
 	@BeforeEach
 	void setUp() {
-		board = new Board(, );
+		board = new Board(3, 3);
 		drawChecker = new DrawChecker();
 		winChecker = new WinChecker();
 	}

@@ -111,27 +111,35 @@ public class Game {
     }
 
     public static void printBoard(char[][] board) {
-        for (int i = 0; i < board.length; i++) {
+        int size = board.length;
+        String boardString = "-".repeat(size*4-2);
+        for (int i = 0; i < size; i++) {
             for (int j = 0; j < board[i].length; j++) {
                 System.out.print(board[i][j] + (j < board[i].length - 1 ? " | " : ""));
             }
             System.out.println();
-            if (i < board.length - 1) {
-                System.out.println("--+---+--");
+            if (i < size - 1) {
+                System.out.println(boardString);
             }
         }
         System.out.println();
     }
 
     public static void printReferenceBoard(int[][] referenceBoard) {
+        int size = referenceBoard.length;
+        String boardString = "-".repeat(size*5-2);
         System.out.println("Example Board: Use these numbers to make a move.");
-        for (int i = 0; i < referenceBoard.length; i++) {
+        for (int i = 0; i < size; i++) {
             for (int j = 0; j < referenceBoard[i].length; j++) {
-                System.out.print(referenceBoard[i][j] + (j < referenceBoard[i].length - 1 ? " | " : ""));
+                if (j < size - 1) {
+                    System.out.printf("%02d | ", referenceBoard[i][j]);
+                } else {
+                    System.out.printf("%02d", referenceBoard[i][j]);
+                }
             }
             System.out.println();
-            if (i < referenceBoard.length - 1) {
-                System.out.println("--+---+---");
+            if (i < size - 1) {
+                System.out.println(boardString);
             }
         }
     }
