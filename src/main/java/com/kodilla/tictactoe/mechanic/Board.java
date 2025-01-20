@@ -1,35 +1,62 @@
 package com.kodilla.tictactoe.mechanic;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Board {
 
-    private final char[][] board = {
-            {' ', ' ', ' '},
-            {' ', ' ', ' '},
-            {' ', ' ', ' '}
-    };
-
-    private final int[][] referenceBoard = {
-            {1, 2, 3},
-            {4, 5, 6},
-            {7, 8, 9}
-    };
-
+    private final char[][] board;
+    private final int[][] referenceBoard;
     private int moveCount = 0;
+    private final List<Integer> fieldList = new ArrayList<>();
+    private final int boardSize;
 
-    public boolean makeMove(int field, char player) throws RuntimeException {
+    public Board(int rows, int cols) {
+        this.board = new char[rows][cols];
+        this.referenceBoard = new int[rows][cols];
+        this.boardSize = rows * cols;
+
+        int fieldNumber = 1;
+
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                board[i][j] = ' ';
+                referenceBoard[i][j] = fieldNumber;
+                fieldList.add(fieldNumber);
+                fieldNumber++;
+            }
+        }
+    }
+
+    public void resetBoard() {
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[i].length; j++) {
+                board[i][j] = ' ';
+            }
+        }
+        moveCount = 0;
+        fieldList.clear();
+        for (int i = 1; i <= boardSize; i++) {
+            fieldList.add(i);
+        }
+    }
+
+    public boolean makeMove(int field, char player) {
+        if (field < 1 || field > boardSize) {
+            return false;
+        }
+
         int row = (field - 1) / 3;
         int col = (field - 1) % 3;
 
-        try {
-                    if (board[row][col] != ' ') {
-            throw new RuntimeException();
+        if (board[row][col] != ' ') {
+            return false;
         }
+
         board[row][col] = player;
         moveCount++;
+        fieldList.remove(Integer.valueOf(field));
         return true;
-    } catch (RuntimeException e) {
-        return false;
-        }
     }
 
     public char[][] getBoard() {
@@ -46,5 +73,9 @@ public class Board {
 
     public int getBoardSize() {
         return board.length * board[0].length;
+    }
+
+    public List<Integer> getFieldList() {
+        return fieldList;
     }
 }

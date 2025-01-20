@@ -17,22 +17,42 @@ class TicTacToeApplicationTests {
 
 	@BeforeEach
 	void setUp() {
-		board = new Board();
+		board = new Board(, );
 		drawChecker = new DrawChecker();
 		winChecker = new WinChecker();
 	}
+
+//	@Test
+//	void testStringInput() {
+//		String input = "abc\n3\n";
+//		InputStream stream = new ByteArrayInputStream(input.getBytes());
+//		System.setIn(stream);
+//
+//		OutputStream outputStream = new ByteArrayOutputStream();
+//		System.setOut(new PrintStream(outputStream));
+//
+//		assertDoesNotThrow(() -> {
+//			Game game = new Game();
+//			game.askInput();
+//		});
+//
+//		String output = outputStream.toString();
+//		assertTrue(output.contains("You entered : abc"));
+//
+//		System.setIn(System.in);
+//		System.setOut(System.out);
+//	}
 
 	@Test()
 	void testOccupiedSpot() {
 		board.makeMove(1, 'X');
 
-		Exception exception = assertThrows(RuntimeException.class, () -> board.makeMove(1, 'O'));
+		assertFalse(board.makeMove(1, 'O'));
 	}
 
 	@Test
 	void testBadMove() {
-
-		Exception exception = assertThrows(RuntimeException.class, () -> board.makeMove(20, 'X'));
+		assertFalse(board.makeMove(12, 'X'));
 	}
 
 	@Test
