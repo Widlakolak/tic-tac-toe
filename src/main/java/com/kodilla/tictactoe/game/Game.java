@@ -4,24 +4,91 @@ import com.kodilla.tictactoe.logic.Bot;
 import com.kodilla.tictactoe.logic.DrawChecker;
 import com.kodilla.tictactoe.logic.WinChecker;
 import com.kodilla.tictactoe.mechanic.Board;
+import com.kodilla.tictactoe.mechanic.Ranking;
 
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Game {
 
-    private final Board board;
-    private final DrawChecker drawChecker = new DrawChecker();
-    private final WinChecker winChecker = new WinChecker();
-    private final Bot bot = new Bot();
+    private Board board;
+    private final DrawChecker drawChecker;
+    private final WinChecker winChecker;
+    private Bot bot;
+    private final Ranking ranking;
     private static final char X = 'X';
     private static final char O = 'O';
-    private boolean isXTurn = true;
+    private char playerChar;
+    private char opponentChar;
+    private boolean isPlayerTurn = true;
 
-    public Game(int rows, int cols) {
-        this.board = new Board(rows, cols);
+    public Game() {
+        this.board = new Board(3, 3);
+        this.drawChecker = new DrawChecker();
+        this.winChecker = new WinChecker();
+        this.ranking = new Ranking();
     }
 
+    public Board getBoard() {
+        return board;
+    }
+    
+
     public void start() {
+        ranking.displayRanking();
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Welcome to Tic-Tac-Toe game!");
+        System.out.println("Choose board size (rows and cols):\n(Default - 3 and 3).");
+        int rows = 3;
+        int cols = 3;
+
+        try {
+            rows = scanner.nextInt();
+            cols = scanner.nextInt();
+            if (rows <= 1 || cols <= 1) {
+                throw new IllegalArgumentException("Computer won!\nRows and cols must be greater than 1.");
+            }
+        } catch (Exception e) {
+            System.out.println("Using default size 3x3.");
+            scanner.nextLine();
+        }
+
+        board = new Board(rows, cols);
+
+        System.out.println("Do you want to play as X or O?\nGame starts with X.");
+        try {
+            playerChar = scanner.next().toUpperCase().charAt(0);
+            if (playerChar != 'X' && playerChar != 'O') {
+                throw new IllegalArgumentException("You will play as X.");
+            }
+        } catch (Exception e) {
+            playerChar = 'X';
+        }
+
+        opponentChar = (playerChar == 'X') ? 'O' : 'X';
+        isPlayerTurn = (playerChar == 'X');
+
+        System.out.println("Choose difficulty level:\n(1 = Easy, 2 = Medium, 3 = Insane)");
+        int difficulty = 1;
+        try {
+            difficulty = scanner.nextInt();
+            if (difficulty < 1 || difficulty > 3) {
+                throw new IllegalArgumentException("It was difficult... set an easy level?");
+            }
+        } catch (Exception e) {
+            System.out.println("Set to Easy.");
+            scanner.nextLine();
+        }
+
+        int maxDepth = switch (difficulty) {
+            case 1 -> 1;
+            case 2 -> 3;
+            case 3 -> Integer.MAX_VALUE;
+            default -> 3;
+        };
+        bot = new Bot(maxDepth);
+
         askInput();
     }
 
@@ -29,50 +96,42 @@ public class Game {
         Scanner keyboardScan = new Scanner(System.in);
         int field;
 
-        System.out.println("Welcome to Tic Tac Toe!");
-        System.out.println("The player who succeeds in placing three of their marks" +
+        System.out.println("The player who succeeds in placing their marks" +
                 "\nin a horizontal, vertical, or diagonal row first is the winner.");
         printReferenceBoard(board.getReferenceBoard());
 
         while (true) {
-            char player = isXTurn ? X : O;
+            char player = isPlayerTurn ? playerChar : opponentChar;
             int maxField = board.getBoardSize();
 
-            if (isXTurn) {
+            if (isPlayerTurn) {
                 System.out.println(player + " turn. Enter a number between 1 and " + maxField + ":");
                 try {
                     field = keyboardScan.nextInt();
                     if (!board.makeMove(field, player)) {
                         printReferenceBoard(board.getReferenceBoard());
                         System.out.println("Now try harder!\nYou entered : " + field +
-                                "\nTip: Look at the reference board\nand enter the number from the field" +
-                                "\nyou want to place your " + player + " sign.");
+                                "\nTip: Look at the reference board." +
+                                "\nWhere you want to place your " + player + " sign?");
                         continue;
                     }
                     System.out.println(player + " to position " + field);
-                } catch (Exception e) {
+                } catch (InputMismatchException e) {
                     String invalidInput = keyboardScan.next();
                     printReferenceBoard(board.getReferenceBoard());
                     System.out.println("Now try harder!\nYou entered : " + invalidInput +
                             "\nTip: Look at the reference board\nand enter the number from the field" +
                             "\nyou want to place your " + player + " sign.");
+                    keyboardScan.nextLine();
                     continue;
                 }
             } else {
-                System.out.println("Computer's turn...");
-                field = bot.autoMove(board);
+                System.out.println("Computer's turn (" + opponentChar + ")...");
+                field = bot.getMove(board, opponentChar, playerChar);
                 if (field == 0) {
-                    System.out.println("Draw! No one won.");
-                    System.out.println("Do you want to play again? (yes/no)");
-                    String response1 = keyboardScan.next().toLowerCase();
-                    if (!response1.equals("yes")) {
-                        System.out.println("Thanks for playing!");
+                    handleEndGame("Draw! No one won.", "Draw");
                         break;
-                    } else {
-                        resetGame();
-                        continue;
                     }
-                }
                 board.makeMove(field, player);
                 System.out.println("Computer placed " + player + " on position " + field);
             }
@@ -80,34 +139,35 @@ public class Game {
             printBoard(board.getBoard());
 
             if (winChecker.win(board)) {
-                System.out.println("Congratulations!! " + player + " won!");
-                System.out.println("Do you want to play again? (yes/no)");
-                String response = keyboardScan.next().toLowerCase();
-                if (!response.equals("yes")) {
-                    System.out.println("Thanks for playing!");
-                    break;
-                } else {
-                    resetGame();
-                }
+                handleEndGame("Congratulations!! " + player + " won!", String.valueOf(player));
+                break;
             }
             if (drawChecker.draw(board)) {
-                System.out.println("Draw! No one won.");
-                System.out.println("Do you want to play again? (yes/no)");
-                String response1 = keyboardScan.next().toLowerCase();
-                if (!response1.equals("yes")) {
-                    System.out.println("Thanks for playing!");
-                    break;
-                } else {
-                    resetGame();
-                }
+                handleEndGame("Draw! No one won.", "Draw");
+                break;
             }
-            isXTurn = !isXTurn;
+            isPlayerTurn = !isPlayerTurn;
         }
     }
 
-    private void resetGame() {
+    private void handleEndGame(String message, String result) {
+        System.out.println(message);
+        ranking.updateRanking(result);
+        System.out.println("Do you want to play again? (yes/no)");
+        Scanner scanner = new Scanner(System.in);
+        String response = scanner.nextLine().toLowerCase();
+        if (!response.equals("yes")) {
+            ranking.displayRanking();
+            System.out.println("Thanks for playing!");
+        } else {
+            resetGame();
+            askInput();
+        }
+    }
+
+    public void resetGame() {
         board.resetBoard();
-        isXTurn = false;
+        isPlayerTurn = true;
     }
 
     public static void printBoard(char[][] board) {
@@ -142,5 +202,25 @@ public class Game {
                 System.out.println(boardString);
             }
         }
+    }
+
+    public char getPlayerChar() {
+        return playerChar;
+    }
+
+    public WinChecker getWinChecker() {
+        return winChecker;
+    }
+
+    public DrawChecker getDrawChecker() {
+        return drawChecker;
+    }
+
+    public char getOpponentChar() {
+        return opponentChar;
+    }
+
+    public Bot getBot() {
+        return bot;
     }
 }

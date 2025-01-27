@@ -2,6 +2,8 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.4.1'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'application'
+	id 'org.openjfx.javafxplugin' version '0.1.0'
 }
 
 group = 'com.kodilla'
@@ -11,6 +13,11 @@ java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(21)
 	}
+}
+
+javafx {
+	version = "23.0.2"
+	modules = [ 'javafx.controls', 'javafx.fxml' ]
 }
 
 repositories {
@@ -25,4 +32,8 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+application {
+	mainClass = 'com.kodilla.tictactoe.TicTacToe'
 }

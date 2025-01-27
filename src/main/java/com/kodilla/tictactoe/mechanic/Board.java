@@ -45,6 +45,17 @@ public class Board {
         }
     }
 
+    public void undoMove(int field) {
+        int row = (field - 1) / cols;
+        int col = (field - 1) % cols;
+
+        if (board[row][col] != ' ') {
+            board[row][col] = ' ';
+            moveCount--;
+            fieldList.add(field);
+        }
+    }
+
     public boolean makeMove(int field, char player) {
         if (field < 1 || field > boardSize) {
             return false;
@@ -81,5 +92,12 @@ public class Board {
 
     public List<Integer> getFieldList() {
         return fieldList;
+    }
+
+    public int getRows() {
+        return rows;
+    }
+    public int getCols() {
+        return cols;
     }
 }
